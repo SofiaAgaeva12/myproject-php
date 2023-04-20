@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Exceptions\ApiException;
 use App\Http\Requests\addRequest;
+use App\Http\Requests\LoginRequest;
+use App\Http\Requests\UserRequest;
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -11,43 +14,55 @@ use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
-    public function login(Request $request) {
-        $validator = Validator::make($request->all(), [
-            'login' => 'required',
-            'password' => 'required',
-        ]);
+    public function login(LoginRequest $login) {
+        $u = User::where(
+            [
+                "login"=> $login -> login,
+                "password"=>$login -> password
+            ]
+        ) -> first();
 
-        if ($validator->fails()) {
-            throw new ApiException(422, "Validation error", $validator->errors());
+        if (!$u) {
+            throw new ApiException(401, "Authentication failed");
         }
 
-        return [
-            'data' => [
-                'user_token' => User::where(['login' => $request->login])->first()->generateToken()
+        $data = [
+            "data" => [
+                "user_token" => $u -> generateToken()
             ]
         ];
+
+        return response()->json($data);
     }
 
     public function logout()
     {
-        Auth::user()->logout();
-        return [
-            'data' => [
-                'message' => 'logout'
+        Auth::user()->api_token = null;
+        Auth::user()->save();
+
+        $data = [
+            "data" => [
+                "message" => "logout"
             ]
         ];
+
+        return response()->json($data);
     }
-    public function store(AddRequest $userRequest)
+    public function index()
     {
-        $user = User::create([
-            'photo_file' => $userRequest->photo_file?->store('photos'),
-        ] + $userRequest->all()
-        );
-        return response()->json([
-            'data' => [
-                'id' => $user->id,
-                'status'=>'created'
-            ]
-        ])->setStatusCode(201, 'Created');
+        return UserResource::collection(User::all());
     }
+
+    public function create(UserRequest $user)
+    {
+        $u = User::create($user->all());
+        $data = [
+            "data" => [
+                "id" => $u->id,
+                "status" => "created"
+            ]
+        ];
+        return response()->json($data, 201);
+    }
+
 }
