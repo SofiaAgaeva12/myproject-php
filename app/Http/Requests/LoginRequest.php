@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests;
 
-use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 
 class LoginRequest extends FormRequest
@@ -14,13 +13,6 @@ class LoginRequest extends FormRequest
      */
     public function authorize()
     {
-        if ($this->login && $this->password) {
-            return User::where([
-                'login'=> $this->login,
-                'password'=>$this->password,
-                'status'=>'working'
-            ])->first();
-        }
         return true;
     }
 
@@ -32,8 +24,8 @@ class LoginRequest extends FormRequest
     public function rules()
     {
         return [
-            'login'=>'required|string',
-            'password'=>'required|string',
+            "login"=> ["required"],
+            "password"=> ["required"],
         ];
     }
 }

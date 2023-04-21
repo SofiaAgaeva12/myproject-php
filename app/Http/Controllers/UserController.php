@@ -15,12 +15,12 @@ use Illuminate\Support\Facades\Validator;
 class UserController extends Controller
 {
     public function login(LoginRequest $login) {
-        $u = User::where(
-            [
-                "login"=> $login -> login,
-                "password"=>$login -> password
-            ]
-        ) -> first();
+
+        $u = User::where($login->all())->first();
+
+        if ($login->login === '') {
+            throw new ApiException(422, "Validation error");
+        }
 
         if (!$u) {
             throw new ApiException(401, "Authentication failed");
