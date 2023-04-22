@@ -29,8 +29,8 @@ class UserRequest extends ApiRequest
             'patronymic'=>['string'],
             'login' => ["required", "unique:users"],
             'password' => ["required"],
-            'photo_file' => ['img:jpeg,png'],
-            'role_id'=>["required", "number", "exists:roles,id"]
+            'photo_file' => ['image:png,jpeg'],
+            'role_id'=>["required", "exists:roles,id"]
         ];
     }
 }

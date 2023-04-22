@@ -10,6 +10,7 @@ use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
@@ -56,6 +57,9 @@ class UserController extends Controller
     public function create(UserRequest $user)
     {
         $u = User::create($user->all());
+        if ($user->photo_file) {
+            Storage::disk('images')->put('/', $user->photo_file);
+        }
         $data = [
             "data" => [
                 "id" => $u->id,

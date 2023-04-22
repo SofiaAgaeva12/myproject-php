@@ -2,8 +2,7 @@
 
 namespace App\Http\Requests;
 
-
-class LoginRequest extends ApiRequest
+class ShiftWorkerRequest extends ApiRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,8 +22,7 @@ class LoginRequest extends ApiRequest
     public function rules()
     {
         return [
-            "login"=> ["required"],
-            "password"=> ["required"],
+            "user_id" => ['required', "exists:users,id"]
         ];
     }
 }

@@ -9,6 +9,8 @@ class WorkShift extends Model
 {
     use HasFactory;
 
+    protected $guarded = [];
+
     public function open()
     {
         $this->active = true;
